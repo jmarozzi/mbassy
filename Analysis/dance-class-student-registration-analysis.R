@@ -68,6 +68,8 @@ total_1 <- student_dataset %>%
   filter(start_term == start_term_and_number_possible_terms$start_term[1]) %>% 
   nrow()
 
+save(total_1, file = "data/total_1.R")
+
 g_1_term_prop <- student_dataset %>%
   filter(start_term == start_term_and_number_possible_terms$start_term[1]) %>%
   ggplot(aes(x = proportion_of_all_terms)) + 
@@ -98,6 +100,8 @@ total_2 <- student_dataset %>%
   filter(start_term == start_term_and_number_possible_terms$start_term[2]) %>% 
   nrow()
 
+save(total_2, file = "data/total_2.R")
+
 g_2_term_prop <- student_dataset %>%
   filter(start_term == start_term_and_number_possible_terms$start_term[2]) %>%
   ggplot(aes(x = proportion_of_all_terms)) + 
@@ -121,10 +125,14 @@ g_2_term_prop <- student_dataset %>%
     nudge_y=1) +
   theme(plot.caption = element_text(hjust = 0, face = "bold"))
 
-#Three terms 
+#Three terms
 total_3 <- student_dataset %>%
   filter(start_term == start_term_and_number_possible_terms$start_term[3]) %>% 
   nrow()
+
+save(total_3, file = "data/total_3.R")
+
+
 g_3_term_prop <- student_dataset %>%
   filter(start_term == start_term_and_number_possible_terms$start_term[3]) %>%
   ggplot(aes(x = proportion_of_all_terms)) + 
@@ -153,6 +161,8 @@ g_3_term_prop <- student_dataset %>%
 total_4 <- student_dataset %>%
   filter(start_term == start_term_and_number_possible_terms$start_term[4]) %>% 
   nrow()
+
+save(total_4, file = "data/total_4.R")
 
 g_4_term_prop <- student_dataset %>%
   filter(start_term == start_term_and_number_possible_terms$start_term[4]) %>%
@@ -200,6 +210,7 @@ g_student_registration_pattern <- student_dataset %>%
   theme(plot.caption = element_text(hjust = 0, face = "bold"))
 
 g_student_registration_pattern_title <- "Breakdown of students by registration pattern"
+
 
 
 

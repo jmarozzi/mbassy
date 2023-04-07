@@ -1,0 +1,14 @@
+name: studio
+title: studio
+username:
+account: jmarozzi
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8781659
+bundleId: 7057057
+url: https://jmarozzi.shinyapps.io/studio/
+when: 1680785519.18058
+lastSyncTime: 1680785519.1806
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: Analysis/dance-class-revenue-analysis.R|Analysis/dance-class-student-registration-analysis.R|Analysis/powerpoint-production.R|outputs/Mbassy-statistics-2023-04-01.PPTX|outputs/Mbassy-statistics-2023-04-03.PPTX|outputs/Mbassy-statistics-2023-04-06.PPTX|Processing/1-process-dance-student-and-revenue.R|Processing/2-process-other.R|setup.R

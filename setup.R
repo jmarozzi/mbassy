@@ -240,3 +240,9 @@ yoga_term_2_2023 <- read_sheet("https://docs.google.com/spreadsheets/d/1l_kbopmI
          mobile_number = as.character(mobile_number),
          order_id = as.character(order_id)) 
 
+
+source("Processing/1-process-dance-student-and-revenue.R")
+source("Processing/2-process-other.R")
+source("Analysis/dance-class-student-registration-analysis.R")
+source("Analysis/dance-class-revenue-analysis.R")
+source("Analysis/powerpoint-production.R")

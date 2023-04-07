@@ -116,6 +116,9 @@ start_term_and_number_possible_terms <-student_dataset2 %>%
   arrange(total_number_of_possible_terms) %>% 
   mutate(start_term = as.character(start_term))
 
+save(start_term_and_number_possible_terms, file = "data/start_term_and_number_possible_terms.R")
+
+
 student_dataset <- student_dataset2 %>% 
   mutate(current_term = start_term_and_number_possible_terms$start_term[1], 
          previous_term = start_term_and_number_possible_terms$start_term[2]) %>% 
