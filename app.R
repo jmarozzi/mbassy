@@ -106,16 +106,13 @@ body <- dashboardBody(
                   
                   box(
                     width = 6, 
-                    plotlyOutput(outputId = "g_4_term_prop")
-                  )
-              )
+                    plotlyOutput(outputId = "g_4_term_prop")))
             ),
             
     tabItem(tabName = "dance_class_revenue",
             fluidRow(
               box(width = 6,
-                  plotlyOutput(outputId = "g_weekly_class_revenue") 
-              ), 
+                  plotlyOutput(outputId = "g_weekly_class_revenue")), 
               
               box(width = 6, 
                   plotlyOutput(outputId = "g_total_class_revenue"))),
@@ -125,10 +122,7 @@ body <- dashboardBody(
                 plotlyOutput(outputId = "g_boxplot_class_revenue_per_student")),
                 
                 box(width = 6, 
-                    plotlyOutput( outputId = "g_revenue_by_quarter"))
-                )
-              
-            ),
+                    plotlyOutput( outputId = "g_revenue_by_quarter")))),
     tabItem(tabName = "studio_costs"),
     tabItem(tabName = "profit")
   ))
@@ -223,8 +217,10 @@ server <- function(input, output) {
            subtitle =  str_c("Current term: ", start_term_and_number_possible_terms$start_term[1]),
            #title = "Breakdown of students by registration pattern",
            fill = "Legend") + 
-      theme(plot.caption = element_text(hjust = 0, face = "bold"), text = 
-              element_text(size = 14), legend.position = "bottom")
+      theme( 
+           # text = element_text(size = 14), 
+            plot.caption = element_text(hjust = 0, face = "bold"),
+            legend.position = "bottom")
     
     ggplotly(d)
   })  
@@ -238,8 +234,7 @@ server <- function(input, output) {
      scale_x_continuous(labels = percent_format(), breaks = c(0,1, by =1/1))+
      labs(x = "% of all possible terms attended", 
           y = "Number of students starting in term", 
-          title = str_c("Retention for students starting in ", start_term_and_number_possible_terms$start_term[1] ),
-          subtitle = str_c("Maximum possible number of terms: ", start_term_and_number_possible_terms$total_number_of_possible_terms[1]), 
+           
           caption = str_c("Total of ", total_1, 
                           " new students started in ", 
                           start_term_and_number_possible_terms$start_term[1])) + 
@@ -254,7 +249,19 @@ server <- function(input, output) {
        nudge_x=0.05,
        nudge_y=1) +
      theme(plot.caption = element_text(hjust = 0, face = "bold"), legend.position = "bottom")
-   ggplotly(e)
+   ggplotly(e)%>% 
+     layout(title = list(text = paste0("Retention for students starting in ", 
+                                       start_term_and_number_possible_terms$start_term[1])),
+            
+            margin = list(l = 70, r = 10, b = 100, t = 50),
+             annotations = list(x = 0.6 , y = -0.3, text = 
+                                 paste0("<b>New students started in this term = ", 
+                                total_1, '; Max possible number of terms = ', 
+                                start_term_and_number_possible_terms$total_number_of_possible_terms[1],
+                                '<b>'), 
+                                xref='paper', yref='paper', showarrow = F, 
+                                xanchor='right', yanchor='auto', xshift=0, yshift=0,
+                                font = list(size = 10)))
  }) 
  
  output$g_2_term_prop <- renderPlotly({
@@ -264,12 +271,7 @@ server <- function(input, output) {
      geom_bar() + 
      scale_x_continuous(labels = percent_format(round(seq(0,1, by =1/2), digits = 1)), breaks = seq(0,1, by =1/2) )+
      labs(x = "Proportion of all possible terms attended", 
-          y = "Number of students starting in term", 
-          title = str_c("Retention for students starting in ", start_term_and_number_possible_terms$start_term[2] ),
-          
-          subtitle = str_c("Maximum possible number of terms: ", start_term_and_number_possible_terms$total_number_of_possible_terms[2]), 
-          caption = str_c("Total of ", total_2, " new students started in ", 
-                          start_term_and_number_possible_terms$start_term[2])) + 
+          y = "Number of students starting in term") + 
      geom_text(
        aes(label=after_stat(count)),
        stat='count',
@@ -281,7 +283,19 @@ server <- function(input, output) {
        nudge_x=0.05,
        nudge_y=1) +
      theme(plot.caption = element_text(hjust = 0, face = "bold"), legend.position = "bottom")
-   ggplotly(f)
+   ggplotly(f)%>% 
+     layout(title = list(text = paste0("Retention for students starting in ", 
+                                       start_term_and_number_possible_terms$start_term[2])),
+            
+            margin = list(l = 70, r = 10, b = 100, t = 50),
+            annotations = list(x = 0.6 , y = -0.3, text = 
+                                 paste0("<b>New students started in this term = ", 
+                                        total_2, '; Max possible number of terms = ', 
+                                        start_term_and_number_possible_terms$total_number_of_possible_terms[2],
+                                        '<b>'), 
+                               xref='paper', yref='paper', showarrow = F, 
+                               xanchor='right', yanchor='auto', xshift=0, yshift=0,
+                               font = list(size = 10)))
  }) 
  
  output$g_3_term_prop <- renderPlotly({
@@ -291,13 +305,7 @@ server <- function(input, output) {
      geom_bar() + 
      scale_x_continuous(labels = percent_format(round(seq(0,1, by =1/3), digits =1)), breaks = seq(0,1, by =1/3) )+
      labs(x = "% of all possible terms attended", 
-          y = "Number of students starting in term", 
-          title = str_c("Retention for students starting in ", start_term_and_number_possible_terms$start_term[3] ),
-          
-          subtitle = str_c("Maximum possible number of terms: ", start_term_and_number_possible_terms$total_number_of_possible_terms[3]), 
-          caption = str_c("Total of ", total_3, 
-                          " new students started in ", 
-                          start_term_and_number_possible_terms$start_term[3])) + 
+          y = "Number of students starting in term") + 
      geom_text(
        aes(label=after_stat(count)),
        stat='count',
@@ -309,7 +317,19 @@ server <- function(input, output) {
        nudge_x=0.05,
        nudge_y=0.5) +
      theme(plot.caption = element_text(hjust = 0, face = "bold"), legend.position = "bottom")
-   ggplotly(g)
+   ggplotly(g) %>% 
+     layout(title = list(text = paste0("Retention for students starting in ", 
+                                       start_term_and_number_possible_terms$start_term[2])),
+            
+            margin = list(l = 70, r = 10, b = 100, t = 50),
+            annotations = list(x = 0.6 , y = -0.3, text = 
+                                 paste0("<b>New students started in this term = ", 
+                                        total_3, '; Max possible number of terms = ', 
+                                        start_term_and_number_possible_terms$total_number_of_possible_terms[3],
+                                        '<b>'), 
+                               xref='paper', yref='paper', showarrow = F, 
+                               xanchor='right', yanchor='auto', xshift=0, yshift=0,
+                               font = list(size = 10)))
  }) 
  
  output$g_4_term_prop <- renderPlotly({
@@ -320,12 +340,7 @@ server <- function(input, output) {
      scale_x_continuous(labels = percent_format(round(seq(0,1, by =1/4), digits = 1)), 
                         breaks = seq(0,1, by =1/4) )+
      labs(x = "% of all possible terms attended", 
-          y = "Number of students starting in term", 
-          title = str_c("Retention for students starting in ", start_term_and_number_possible_terms$start_term[4] ),
-          subtitle = str_c("Maximum possible number of terms: ", start_term_and_number_possible_terms$total_number_of_possible_terms[4]), 
-          caption = str_c("Total of ", total_4, 
-                          " new students started in ", 
-                          start_term_and_number_possible_terms$start_term[4])) + 
+          y = "Number of students starting in term") + 
      geom_text(
        aes(label=after_stat(count)),
        stat='count',
@@ -337,7 +352,20 @@ server <- function(input, output) {
        nudge_x=0.05,
        nudge_y=1)+
      theme(plot.caption = element_text(hjust = 0, face = "bold"), legend.position = "bottom")
-   ggplotly(h)
+   ggplotly(h) %>% 
+     layout(title = list(text = paste0("Retention for students starting in ", 
+                                       start_term_and_number_possible_terms$start_term[4])),
+            
+            margin = list(l = 70, r = 10, b = 100, t = 50),
+            annotations = list(x = 0.6 , y = -0.3, text = 
+                                 paste0("<b>New students started in this term = ", 
+                                        total_4, '; Max possible number of terms = ', 
+                                        start_term_and_number_possible_terms$total_number_of_possible_terms[4],
+                                        '<b>'), 
+                               xref='paper', yref='paper', showarrow = F, 
+                               xanchor='right', yanchor='auto', xshift=0, yshift=0,
+                               font = list(size = 10)))
+      
  }) 
  
  output$g_weekly_class_revenue <- renderPlotly({

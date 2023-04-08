@@ -1,7 +1,7 @@
 #revenue data 
 #### by term ####
 
-save(combined_statistics, file = "combined_statistics.R")
+save(combined_statistics, file = "data/combined_statistics.R")
 
 g_weekly_class_revenue<- combined_statistics %>% 
   ggplot(aes(x = time_stamp, y = weekly_class_revenue)) + 
