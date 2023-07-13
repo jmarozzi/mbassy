@@ -2,7 +2,9 @@
 
 #### Join terms ####
 
-all_terms_full_form <- rbind(t4_2022_min, t5_2022_min, t1_2023_min, t2_2023_min) %>% 
+all_terms_full_form <- rbind(t4_2022_min, t5_2022_min, t1_2023_min, t2_2023_min, t3_2023_min, t4_2023_min) %>% 
+  mutate(open_flag = ifelse(is.na(open_flag), 0, open_flag)) %>% 
+  mutate(open_week = factor(open_week)) %>% 
   mutate(time_stamp = as_factor(time_stamp),
          time_order = as_factor(time_order)) %>% 
   mutate(date = ymd(str_sub(date_time_paid, end =10L))) %>% 
@@ -10,8 +12,8 @@ all_terms_full_form <- rbind(t4_2022_min, t5_2022_min, t1_2023_min, t2_2023_min)
   mutate(fiscal_year_simple = as.numeric(str_sub(quarter,3,4))) %>% 
   mutate(fiscal_year_descriptive = str_c("FY", fiscal_year_simple-1, "-",fiscal_year_simple )) %>% 
   mutate(flag_empty_class_selection = ifelse(total_casuals == 0 & total_upfront_terms ==0,1,0 )) %>% 
-  mutate(quarter_character = as.character(quarter))
-
+  mutate(quarter_character = as.character(quarter)) %>% 
+  mutate(tdd_month_number = classify_date_TDD(date))
 
 term_number <- all_terms_full_form %>%
   select(time_stamp)
@@ -108,18 +110,20 @@ student_dataset2 <- student_dataset1 %>%
   mutate(proportion_of_all_terms = round((number_of_terms_attended/ total_number_of_possible_terms), digits = 2)) %>% 
   mutate(active_flag = ifelse(relative_current_term ==1,1,0)) 
 
+
 start_term_and_number_possible_terms <-student_dataset2 %>% 
   select(start_term,total_number_of_possible_terms ) %>% 
   group_by(start_term) %>% 
   slice(1) %>% 
   ungroup() %>% 
   arrange(total_number_of_possible_terms) %>% 
-  mutate(start_term = as.character(start_term))
+  mutate(start_term = as.character(start_term)) 
+
 
 save(start_term_and_number_possible_terms, file = "data/start_term_and_number_possible_terms.R")
 
 
-student_dataset <- student_dataset2 %>% 
+student_dataset3 <- student_dataset2 %>% 
   mutate(current_term = start_term_and_number_possible_terms$start_term[1], 
          previous_term = start_term_and_number_possible_terms$start_term[2]) %>% 
   mutate(student_registration_pattern = case_when( 
@@ -143,12 +147,44 @@ per_student_total_class_registrations_and_revenue <- all_terms_full_form %>%
   summarise(total_upfronts = sum(total_upfront_terms), 
             total_casuals = sum(total_casuals), 
             total_class_revenue = sum(minus_transaction_fee, na.rm = TRUE),
-            total_open_flag = sum(open_flag)) %>% 
-  ungroup() %>% 
-  mutate(any_upfront = factor(ifelse(total_upfronts >= 1, "Upfront", "No upfront")),
-         any_upfront_numeric = ifelse(total_casuals >= 1, 1, 0),
-         any_casual = factor(ifelse(total_casuals >= 1, "Casual", "No casual")),
-         any_casual_numeric = ifelse(total_casuals >= 1, 1, 0)) 
+            total_open_flag = sum(open_flag)) %>%
+  mutate(any_upfront = factor(ifelse(total_upfronts > 0, "Upfront", "No upfront")),
+         any_upfront_numeric = ifelse(total_upfronts > 0, 1, 0),
+         any_casual = factor(ifelse(total_casuals > 0, "Casual", "No casual")),
+         any_casual_numeric = ifelse(total_casuals > 0, 1, 0)) 
+
+upfront_ids_by_term <-  per_student_total_class_registrations_and_revenue %>% 
+    ungroup() %>% 
+  filter(any_upfront_numeric ==1 ) %>%
+  select(time_stamp, unique_id) %>% 
+    mutate(value =1) %>% 
+    mutate(time_stamp = str_c(to_snake_case(as.character(time_stamp) ), "_upfront" )) %>% 
+    pivot_wider(names_from = time_stamp,values_from = value, values_fill = 0 ) 
+
+student_dataset4 <- student_dataset3 %>% 
+  left_join(upfront_ids_by_term)
+
+unique_ids_without_how_did_you_hear <- student_dataset4 %>% 
+  filter(is.na(how_did_you_hear_about_us)) %>% 
+  select(unique_id)
+
+all_how_did_you_hear <- all_terms_full_form %>% 
+  filter(unique_id %in% unique_ids_without_how_did_you_hear$unique_id) %>% 
+  select(unique_id, how_did_you_hear_about_us) %>% 
+  count(unique_id, how_did_you_hear_about_us) %>% 
+  arrange(unique_id,how_did_you_hear_about_us) %>% 
+  select(-n) %>% 
+  group_by(unique_id) %>% 
+  slice(1) %>% 
+  rename(how_did_you_hear_about_us_2 = how_did_you_hear_about_us) %>% 
+  ungroup()
+
+student_dataset <- student_dataset4 %>% 
+  left_join(all_how_did_you_hear) %>% 
+  mutate(how_did_you_hear_about_us = ifelse(!is.na(how_did_you_hear_about_us_2), how_did_you_hear_about_us_2, 
+                                            how_did_you_hear_about_us)) %>% 
+  select(-how_did_you_hear_about_us_2)
+
 
 summary_statistics_class_registrations_and_revenue <- per_student_total_class_registrations_and_revenue %>%
   group_by(time_stamp) %>% 
