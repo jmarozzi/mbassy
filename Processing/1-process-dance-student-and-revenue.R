@@ -2,7 +2,7 @@
 
 #### Join terms ####
 
-all_terms_full_form <- rbind(t4_2022_min, t5_2022_min, t1_2023_min, t2_2023_min, t3_2023_min, t4_2023_min) %>% 
+all_terms_full_form <- rbind(t4_2022_min, t5_2022_min, t1_2023_min, t2_2023_min, t3_2023_min, t4_2023_min, t5_2023_min) %>% 
   mutate(open_flag = ifelse(is.na(open_flag), 0, open_flag)) %>% 
   mutate(open_week = factor(open_week)) %>% 
   mutate(time_stamp = as_factor(time_stamp),
@@ -94,8 +94,8 @@ first_term <- all_terms_full_form %>%
 
 student_dataset2 <- student_dataset1 %>% 
   left_join(student_term_attendance_for_join) %>% 
-  group_by(unique_id) %>% 
-  mutate(number_of_terms_attended = sum(term_2_2023, term_1_2023, term_5_2022, term_4_2022)) %>% 
+  #group_by(unique_id) %>% 
+  mutate(number_of_terms_attended = term_4_2023 + term_3_2023 + term_2_2023 + term_1_2023 + term_5_2022 + term_4_2022) %>% 
   ungroup() %>% 
   left_join(current_term) %>% 
   left_join(previous_term) %>% 
@@ -220,3 +220,4 @@ overview_statistics <- all_terms_full_form %>%
 combined_statistics <- overview_statistics %>% 
   left_join(summary_statistics_class_registrations_and_revenue) %>% 
   mutate(total_casuals_or_upfronts = total_upfronts + total_casuals)
+

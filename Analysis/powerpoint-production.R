@@ -30,4 +30,3 @@ presentation <- create_nous_pptx(title = "MBassy statistics",
   
   
 print(presentation, str_c("outputs/Mbassy-statistics-",today_date, ".PPTX"))
-  

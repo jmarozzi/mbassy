@@ -10,8 +10,8 @@ term_dates_for_whole_picture_financials <- start_term_and_number_possible_terms 
       time_stamp == "Term 1 2023" ~  "2023-01-09",
       time_stamp ==  "Term 2 2023" ~ "2023-03-13", 
       time_stamp == "Term 3 2023" ~ "2023-05-08", 
-      time_stamp == "Term 4 2023" ~ "2023-06-05")
-  ) %>% 
+      time_stamp == "Term 4 2023" ~ "2023-06-05",
+      time_stamp == "Term 5 2023" ~ "2023-07-31")) %>% 
   mutate(
     term_end_date_for_non_class_transactions = case_when(
       time_stamp == "Term 4 2022*" ~ "2022-11-06", 
@@ -19,8 +19,8 @@ term_dates_for_whole_picture_financials <- start_term_and_number_possible_terms 
       time_stamp == "Term 1 2023" ~ "2023-03-12", 
       time_stamp ==  "Term 2 2023" ~ "2023-05-07",
       time_stamp == "Term 3 2023" ~ "2023-06-04", 
-      time_stamp == "Term 4 2023" ~ "2023-07-30")
-  ) %>% 
+      time_stamp == "Term 4 2023" ~ "2023-07-30",
+      time_stamp == "Term 5 2023" ~ "2023-09-24"))  %>% 
   rbind(tibble(
     time_stamp = c("Prep for 915 Collins 2022" , "Summer break 22/23"), 
     term_start_date_for_non_class_transactions = c("2022-09-12", "2022-12-05"),
@@ -86,16 +86,21 @@ term_4_2023_interval <- term_dates_for_whole_picture_financials %>%
   filter(time_stamp == "Term 4 2023") %>% 
   pull(interval)
 
+term_5_2023_interval<- term_dates_for_whole_picture_financials %>% 
+  select(time_stamp, interval) %>% 
+  filter(time_stamp == "Term 5 2023") %>% 
+  pull(interval)
+
 # process daily report
 daily_report_joined <- bind_rows(daily_report_2022, daily_report_2023) %>% 
-  filter(!(drinks == 0 & merch == 0 & private_lessons == 0 & studio_hire ==0 & costs == 0)) %>% 
+  filter(!(drinks == 0 & merch == 0 & privates == 0 & studio_hire ==0 & costs == 0 & gigs == 0)) %>% 
   mutate(date = dmy(date)) %>%
   mutate(quarter = quarter(date, type = "year.quarter", fiscal_start = 7 )) %>%
   mutate(fiscal_year_simple = as.numeric(str_sub(quarter,3,4))) %>%
   mutate(fiscal_year_descriptive = str_c("FY", fiscal_year_simple-1, "-",fiscal_year_simple)) %>%
     mutate(quarter_character = as.character(quarter)) %>% 
   mutate(across(
-    .cols = c(drinks, merch, private_lessons, studio_hire, costs),
+    .cols = c(drinks, merch, privates, studio_hire, gigs, special_events, costs),
     .fns = ~ ifelse(is.na(.x),0, .x)
   )) %>%
   
@@ -105,14 +110,22 @@ daily_report_joined <- bind_rows(daily_report_2022, daily_report_2023) %>%
     date %within% term_5_2022_interval ~ "Term 5 2022*",
     date %within% summer_22_23_interval ~ "Summer break 22/23",
     date %within% term_1_2023_interval ~ "Term 1 2023", 
-    date %within% term_2_2023_interval ~ "Term 2 2023" ))
+    date %within% term_2_2023_interval ~ "Term 2 2023", 
+    date %within% term_3_2023_interval ~ "Term 3 2023", 
+    date %within% term_4_2023_interval ~ "Term 4 2023", 
+    date %within% term_5_2023_interval ~ "Term 5 2023"))
+#view(tail(daily_report_joined, n =10) )
+
 
 ###### REVENUE ####
 #Daily
 daily_revenue <- daily_report_joined %>% 
-  select(date:private_lessons, time_stamp) %>% 
-  pivot_longer(cols = drinks:private_lessons, names_to = "category", values_to = "value") %>% 
+  select(date:special_events, time_stamp) %>% 
+  pivot_longer(cols = drinks:special_events, names_to = "category", values_to = "value") %>% 
   filter(value >0)
+
+
+
 
 #Dance class 
 dance_class_revenue <- all_terms_full_form %>% 
@@ -136,12 +149,7 @@ all_revenue <- bind_rows(daily_revenue, dance_class_revenue,yoga_class_revenue) 
   mutate(tdd_month_number = classify_date_TDD(date))
 write.csv(all_revenue, file = "outputs/all_revenue.csv")
 
-all_revenue %>% 
-  group_by(category) %>% 
-  summarise(
-    dollar = sum(value)
-  ) %>% 
-  mutate(monthly = dollar/7)
+
   
 
 ####### COSTS ####

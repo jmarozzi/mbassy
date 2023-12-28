@@ -20,21 +20,24 @@ save(per_student_total_class_registrations_and_revenue, file = "data/per_student
 g_unique_students_by_term<- per_student_total_class_registrations_and_revenue %>% 
   count(time_stamp, any_upfront) %>% 
   group_by(time_stamp) %>% 
-  mutate(perc = n / sum(n)) %>% 
+  mutate(perc = n / sum(n), 
+         total = sum(n)) %>%
   ggplot(aes(x = time_stamp, y = n, fill = factor(any_upfront))) + 
   geom_col() + 
   geom_text(aes(x = time_stamp, y = n, label = scales::percent(perc)), position = position_stack(vjust = 0.5), color = "white") +
+  geom_text(aes(x = time_stamp, y = total, label = total, vjust = -.5)) +
   labs(x = "Term", 
        y = "Number of unique students", 
        fill = "Legend",
        title = "Number of unique students per term broked down by upfront registrations") + 
   scale_x_discrete(labels = label_wrap(7)) + 
+  expand_limits(y = c(0,125))+
   theme(legend.position = "bottom") 
-
 
 g_unique_students_by_term_gt<- "Number of unique students per term broken down by upfront registrations(since Term 4 2022)"
 
 save(all_terms_full_form, file = "data/all_terms_full_form.R")
+
 
 g_registrations<- all_terms_full_form %>% 
   select(time_stamp, total_casuals, total_upfront_terms) %>% 
@@ -43,20 +46,24 @@ g_registrations<- all_terms_full_form %>%
                values_to = "number_of_registrations") %>% 
   mutate(registration_type = ifelse(registration_type == "total_casuals", "Casual", "Upfront Term")) %>% 
   group_by(time_stamp,registration_type) %>% 
-  summarise(number_of_registrations = sum(number_of_registrations)) %>% 
+  summarise(number_of_registrations = sum(number_of_registrations, na.rm = TRUE)) %>% 
   ungroup() %>% 
   group_by(time_stamp) %>% 
-  mutate(prop = number_of_registrations/ sum(number_of_registrations)) %>% 
+  mutate(prop = number_of_registrations/ sum(number_of_registrations), 
+         total_registrations = sum(number_of_registrations, na.rm = TRUE)) %>% 
   ggplot(aes(x = time_stamp, y = number_of_registrations, fill = registration_type)) + 
   geom_col() + 
   geom_text(aes(x = time_stamp, y = number_of_registrations, label = scales::percent(prop)), 
             position = position_stack(vjust = 0.5), color = "white") +
-  labs(x = "Term", 
+  geom_text(aes(x = time_stamp, y = total_registrations, label = total_registrations), 
+            vjust = -0.5) +
+    labs(x = "Term", 
        y = "Number of registrations", 
        fill = "Legend",
        title = "Number of registrations - casual vs. upfront") + 
   scale_x_discrete(labels = label_wrap(7)) + 
-  theme(legend.position = "bottom") 
+  expand_limits(y = c(0, 300)) + 
+  theme(legend.position = "bottom")  
 
 g_registrations_gt <- "Number of registrations - casual vs. upfront"
 
@@ -199,7 +206,7 @@ g_student_registration_pattern <- student_dataset %>%
   geom_text(aes(
     label = percent(after_stat(prop)), group = 1), 
     stat = 'count', 
-    nudge_y = 3) + 
+    nudge_y = 5) + 
   scale_x_discrete(label = wrap_format(5)) + 
   labs(x = "Student registration pattern",
        y = "Number of students", 
