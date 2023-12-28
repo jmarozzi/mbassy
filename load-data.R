@@ -263,7 +263,7 @@ t4_2023_unique_id <- term_4_2023  %>%
   count(mobile_number, first_name, last_name) %>%  
   mutate(unique_id = ifelse(mobile_number == "-", first_name, mobile_number)) %>% 
   select(-n)
-view(t4_2023_unique_id)
+
 term_4_2023_id <- term_4_2023 %>% 
   left_join(t4_2023_unique_id) 
 
@@ -288,11 +288,15 @@ term_4_2023_dance_profit_raw <- read_sheet("https://docs.google.com/spreadsheets
   clean_names()
 
 t4_profits_colnames <- term_4_2023_dance_profit_raw$x1
+
 term_4_2023_dance_profit_no_row_1 <- term_4_2023_dance_profit_raw[,-1]
+
 term_4_2023_dance_profit_transposed <- t(term_4_2023_dance_profit_no_row_1) %>% 
   as_tibble() %>% 
   remove_rownames()
+
 colnames(term_4_2023_dance_profit_transposed) <- t4_profits_colnames 
+
 term_4_2023_dance_profit<-   term_4_2023_dance_profit_transposed %>% 
   clean_names() %>%
   select(-term) %>% 
@@ -353,7 +357,9 @@ term_5_2023_dance_profit_no_row_1 <- term_5_2023_dance_profit_raw[,-1]
 term_5_2023_dance_profit_transposed <- t(term_5_2023_dance_profit_no_row_1) %>% 
   as_tibble() %>% 
   remove_rownames()
+
 colnames(term_5_2023_dance_profit_transposed) <- t5_profits_colnames 
+
 term_5_2023_dance_profit<-   term_5_2023_dance_profit_transposed %>% 
   clean_names() %>%
   select(-term) %>% 
@@ -408,20 +414,21 @@ term_6_2023_dance_profit_raw <- read_sheet("https://docs.google.com/spreadsheets
   clean_names()
 
 
-t5_profits_colnames <- term_5_2023_dance_profit_raw$x1
-term_5_2023_dance_profit_no_row_1 <- term_5_2023_dance_profit_raw[,-1]
-term_5_2023_dance_profit_transposed <- t(term_5_2023_dance_profit_no_row_1) %>% 
+t6_profits_colnames <- term_6_2023_dance_profit_raw$x1
+term_6_2023_dance_profit_no_row_1 <- term_6_2023_dance_profit_raw[,-1]
+term_6_2023_dance_profit_transposed <- t(term_6_2023_dance_profit_no_row_1) %>% 
   as_tibble() %>% 
   remove_rownames()
-colnames(term_5_2023_dance_profit_transposed) <- t5_profits_colnames 
-term_5_2023_dance_profit<-   term_5_2023_dance_profit_transposed %>% 
+
+colnames(term_6_2023_dance_profit_transposed) <- t6_profits_colnames 
+term_6_2023_dance_profit<-   term_6_2023_dance_profit_transposed %>% 
   clean_names() %>%
   select(-term) %>% 
-  mutate(term = 5, 
+  mutate(term = 6, 
          year = 2023, 
          weeks = 8, 
-         time_stamp = "Term 5 2023",
-         time_order = "2023-5")
+         time_stamp = "Term 6 2023",
+         time_order = "2023-6")
 
 
 
